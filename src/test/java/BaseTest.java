@@ -3,7 +3,8 @@ import com.google.gson.stream.JsonReader;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.parsing.Parser;
 import model.User;
-import org.testng.annotations.BeforeTest;
+import org.testng.Assert;
+import org.testng.asserts.SoftAssert;
 import retrofit2.Response;
 import utils.restassured.RestAssuredController;
 import utils.retrofit.RetrofitController;
@@ -44,6 +45,19 @@ public class BaseTest {
 
     void initRestAssured() {
         RestAssuredController.initController(API_SOURCE);
-        RestAssured.defaultParser = Parser.JSON;;
+        RestAssured.defaultParser = Parser.JSON;
+        ;
+    }
+
+    protected void verifyUsers(List<User> actualUsers) {
+        // get expected users:
+        List<User> expectedUsers = getExpectedUsers();
+
+        Assert.assertEquals(expectedUsers.size(), actualUsers.size(), "Object sizes are not equal.");
+        SoftAssert softAssert = new SoftAssert();
+        for (int i = 0; i < expectedUsers.size(); i++) {
+            softAssert.assertEquals(expectedUsers.get(i), actualUsers.get(i), String.format("User %d is not equal to expected.", i));
+        }
+        softAssert.assertAll();
     }
 }
